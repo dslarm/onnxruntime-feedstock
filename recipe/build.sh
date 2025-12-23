@@ -57,8 +57,6 @@ if [[ ! -z "${cuda_compiler_version+x}" && "${cuda_compiler_version}" != "None" 
         cp -r ${PREFIX}/targets/${NVARCH}-linux/include ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/third_party/gpus/cuda/extras/CUPTI/
         mkdir -p ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/third_party/gpus/cudnn
         cp ${PREFIX}/include/cudnn*.h ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/third_party/gpus/cudnn/
-        mkdir -p ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/third_party/nccl
-        cp ${PREFIX}/include/nccl.h ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/third_party/nccl/
         rsync -a ${PREFIX}/targets/${NVARCH}-linux/lib/ ${BUILD_PREFIX}/targets/${NVARCH}-linux/lib/
         mkdir -p ${BUILD_PREFIX}/targets/${NVARCH}-linux/bin
         ln -sf ${BUILD_PREFIX}/bin/fatbinary ${BUILD_PREFIX}/targets/${NVARCH}-linux/bin/fatbinary
@@ -67,7 +65,6 @@ if [[ ! -z "${cuda_compiler_version+x}" && "${cuda_compiler_version}" != "None" 
 
         export LOCAL_CUDA_PATH="${BUILD_PREFIX}/targets/${NVARCH}-linux"
         export LOCAL_CUDNN_PATH="${PREFIX}"
-        export LOCAL_NCCL_PATH="${PREFIX}"
 
         # hmaarrfk -- 2023/12/30
         # This logic should be safe to keep in even when the underlying issue is resolved
@@ -79,7 +76,6 @@ if [[ ! -z "${cuda_compiler_version+x}" && "${cuda_compiler_version}" != "None" 
         # Needs GCC 13+
         export LOCAL_CUDA_PATH="${BUILD_PREFIX}/targets/${NVARCH}-linux"
         export LOCAL_CUDNN_PATH="${PREFIX}"
-        export LOCAL_NCCL_PATH="${PREFIX}"
 
 
     else
