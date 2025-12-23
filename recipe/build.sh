@@ -44,12 +44,43 @@ if [[ ! -z "${cuda_compiler_version+x}" && "${cuda_compiler_version}" != "None" 
     elif [[ "${target_platform}" == "linux-aarch64" ]]; then
         export CUDA_HOME="${BUILD_PREFIX}/targets/sbsa-linux"
         NVARCH=sbsa
+        export TF_CUDA_PATHS="${BUILD_PREFIX}/targets/${NVARCH}-linux,${PREFIX}/targets/${NVARCH}-linux"
+        # XLA can only cope with a single cuda header include directory, merge both
         rsync -a ${PREFIX}/targets/${NVARCH}-linux/include/ ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/
+
+        # Although XLA supports a non-hermetic build, it still tries to find headers in the hermetic locations.
+        # We do this in the BUILD_PREFIX to not have any impact on the resulting jaxlib package.
+        # Otherwise, these copied files would be included in the package.
+        rm -rf ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/third_party
+        mkdir -p ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/third_party/gpus/cuda/extras/CUPTI
+        cp -r ${PREFIX}/targets/${NVARCH}-linux/include ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/third_party/gpus/cuda/
+        cp -r ${PREFIX}/targets/${NVARCH}-linux/include ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/third_party/gpus/cuda/extras/CUPTI/
+        mkdir -p ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/third_party/gpus/cudnn
+        cp ${PREFIX}/include/cudnn*.h ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/third_party/gpus/cudnn/
+        mkdir -p ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/third_party/nccl
+        cp ${PREFIX}/include/nccl.h ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/third_party/nccl/
         rsync -a ${PREFIX}/targets/${NVARCH}-linux/lib/ ${BUILD_PREFIX}/targets/${NVARCH}-linux/lib/
         mkdir -p ${BUILD_PREFIX}/targets/${NVARCH}-linux/bin
         ln -sf ${BUILD_PREFIX}/bin/fatbinary ${BUILD_PREFIX}/targets/${NVARCH}-linux/bin/fatbinary
         ln -sf ${BUILD_PREFIX}/bin/nvlink ${BUILD_PREFIX}/targets/${NVARCH}-linux/bin/nvlink
         ln -sf ${BUILD_PREFIX}/bin/ptxas ${BUILD_PREFIX}/targets/${NVARCH}-linux/bin/ptxas
+
+        export LOCAL_CUDA_PATH="${BUILD_PREFIX}/targets/${NVARCH}-linux"
+        export LOCAL_CUDNN_PATH="${PREFIX}"
+        export LOCAL_NCCL_PATH="${PREFIX}"
+
+        # hmaarrfk -- 2023/12/30
+        # This logic should be safe to keep in even when the underlying issue is resolved
+        # xref: https://github.com/conda-forge/cuda-nvcc-impl-feedstock/issues/9
+        if [[ -x ${BUILD_PREFIX}/nvvm/bin/cicc ]]; then
+            cp ${BUILD_PREFIX}/nvvm/bin/cicc ${BUILD_PREFIX}/bin/cicc
+        fi
+
+        # Needs GCC 13+
+        export LOCAL_CUDA_PATH="${BUILD_PREFIX}/targets/${NVARCH}-linux"
+        export LOCAL_CUDNN_PATH="${PREFIX}"
+        export LOCAL_NCCL_PATH="${PREFIX}"
+
 
     else
       echo "CUDA 12 has not been configured for this architecture"
