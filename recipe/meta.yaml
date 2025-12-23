@@ -41,8 +41,6 @@ build:
   number: {{ build }}
   # don't build cuda versions with novec
   skip: true  # [ (cuda_compiler_version != "None") and (suffix == "-novec") ]
-  # cross-compilation of linux-aarch64 cuda builds are currently broken
-  skip: true  # [(cuda_compiler_version != "None") and aarch64]
   # Since 1.11, power9 seems to be required.
   skip: true  # [ppc64le]
   string: py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}_{{ build_ext }}
