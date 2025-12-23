@@ -59,6 +59,7 @@ cmake_extra_defines=( "EIGEN_MPL2_ONLY=ON" \
                       "onnxruntime_BUILD_SHARED_LIB=ON" \
                       "onnxruntime_BUILD_UNIT_TESTS=$BUILD_UNIT_TESTS" \
                       "CMAKE_PREFIX_PATH=$PREFIX" \
+                      "CMAKE_VERBOSE_MAKEFILE=ON" \
                       "CMAKE_CUDA_ARCHITECTURES=all-major"
 )
 
@@ -73,6 +74,8 @@ do
     fi
 done
 
+NVLINK=`which nvlink`
+alias nvlink="$NVLINK --verbose"
 
 python tools/ci_build/build.py \
     --compile_no_warning_as_error \
@@ -86,7 +89,6 @@ python tools/ci_build/build.py \
     --build ${RUN_TESTS_BUILD_PY_OPTIONS} \
     --skip_submodule_sync \
     --path_to_protoc_exe $BUILD_PREFIX/bin/protoc \
-    --verbose \
     ${BUILD_ARGS}
 
 for whl_file in build-ci/Release/dist/onnxruntime*.whl; do
