@@ -42,7 +42,15 @@ if [[ ! -z "${cuda_compiler_version+x}" && "${cuda_compiler_version}" != "None" 
     if [[ "${target_platform}" == "linux-64" ]]; then
       export CUDA_HOME="${BUILD_PREFIX}/targets/x86_64-linux"
     elif [[ "${target_platform}" == "linux-aarch64" ]]; then
-      export CUDA_HOME="${BUILD_PREFIX}/targets/sbsa-linux"
+        export CUDA_HOME="${BUILD_PREFIX}/targets/sbsa-linux"
+        NVARCH=sbsa
+        rsync -a ${PREFIX}/targets/${NVARCH}-linux/include/ ${BUILD_PREFIX}/targets/${NVARCH}-linux/include/
+        rsync -a ${PREFIX}/targets/${NVARCH}-linux/lib/ ${BUILD_PREFIX}/targets/${NVARCH}-linux/lib/
+        mkdir -p ${BUILD_PREFIX}/targets/${NVARCH}-linux/bin
+        ln -sf ${BUILD_PREFIX}/bin/fatbinary ${BUILD_PREFIX}/targets/${NVARCH}-linux/bin/fatbinary
+        ln -sf ${BUILD_PREFIX}/bin/nvlink ${BUILD_PREFIX}/targets/${NVARCH}-linux/bin/nvlink
+        ln -sf ${BUILD_PREFIX}/bin/ptxas ${BUILD_PREFIX}/targets/${NVARCH}-linux/bin/ptxas
+
     else
       echo "CUDA 12 has not been configured for this architecture"
       exit 1
