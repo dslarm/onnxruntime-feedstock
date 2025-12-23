@@ -86,6 +86,7 @@ python tools/ci_build/build.py \
     --build ${RUN_TESTS_BUILD_PY_OPTIONS} \
     --skip_submodule_sync \
     --path_to_protoc_exe $BUILD_PREFIX/bin/protoc \
+    --verbose \
     ${BUILD_ARGS}
 
 for whl_file in build-ci/Release/dist/onnxruntime*.whl; do
